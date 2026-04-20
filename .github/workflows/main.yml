@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@v1
+
+    - name: Run Gradle build
+      run: ./gradlew build
+
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
+
+    - name: Upload APK to artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: StudyPlanner-APK
+        path: app/build/outputs/apk/release/*.apk
